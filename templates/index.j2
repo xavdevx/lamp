@@ -1,0 +1,16 @@
+<html>
+<head>
+<title>{{ansible_os_family}} Apache Web Server </title>
+</head>
+<body>
+<h1>{{ansible_distribution}} Apache Web Server</h1>
+{% if lamp_packages is defined %}
+<h2>Packages</h2>
+<ul>
+{% for item in lamp_packages %}
+<li>{{item}}</li>
+{% endfor %}
+</ul>
+{% endif %}
+</body>
+</html>
