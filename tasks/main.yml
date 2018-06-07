@@ -1,0 +1,42 @@
+---
+# tasks file for lamp
+- name: Lamp installation
+  include_vars: '{{ansible_os_family}}.yml'
+
+- name: Debian Ubuntu
+  apt: name={{item}} state=present
+  with_items: '{{lamp_packages}}'
+  when: ansible_os_family == 'Debian'
+  notify:
+    - starting and enabling apache
+    - starting and enabling mariadb
+
+- name: Centos
+  yum: name={{item}} state=present  
+  with_items: '{{lamp_packages}}'
+  when: ansible_os_family == 'RedHat'
+  notify:
+    - starting and enabling apache
+    - starting and enabling mariadb
+
+- name: Centos ouvrir le part feu sur le port 80
+  firewalld: 
+    port: 80/tcp
+    permanent: true
+    state: enabled 
+  when: ansible_os_family == 'RedHat'
+
+
+- name: Centos reload parefeu
+  shell: firewall-cmd --reload
+  when: ansible_os_family == 'RedHat'
+
+- name: Mise en place du template
+  template:
+    src: templates/index.j2
+    dest: /var/www/html/index.html
+    backup: yes
+    owner: "{{apache_user}}"
+    group: "{{apache_user}}"
+    mode: 0644
+    
